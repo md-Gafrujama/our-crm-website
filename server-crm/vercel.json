@@ -3,31 +3,21 @@
   "builds": [
     {
       "src": "index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": [
-          "prisma/schema.prisma",
-          "prisma/migrations/**",
-          "node_modules/.prisma/**",
-          "node_modules/@prisma/client/**"
-        ],
-        "maxLambdaSize": "15mb"
-      }
+      "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "index.js",
-      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+      "dest": "index.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
-  "build": {
-    "env": {
-      "PRISMA_GENERATE": "true"
+  "functions": {
+    "index.js": {
+      "maxDuration": 30
     }
   }
 }

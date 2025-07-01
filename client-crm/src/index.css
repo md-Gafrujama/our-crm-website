@@ -5,3 +5,6 @@
 #root{
     max-width: none;
 }
+body {
+  overflow-x: hidden;
+}
