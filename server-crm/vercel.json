@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "server",
   "builds": [
     {
       "src": "index.js",
@@ -9,52 +8,12 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/index.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.js"
+      "dest": "index.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     }
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "index.js": {
-      "maxDuration": 30
-    }
-  },
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "http://localhost:5173"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-Requested-With, Content-Type, Accept, Authorization"
-        },
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/index.js"
-    }
-  ],
-  "regions": ["iad1"],
-  "buildCommand": "npx prisma generate",
-  "installCommand": "npm install"
+  }
 }
