@@ -3,7 +3,16 @@
   "builds": [
     {
       "src": "index.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "prisma/schema.prisma",
+          "prisma/migrations/**",
+          "node_modules/.prisma/**",
+          "node_modules/@prisma/client/**"
+        ],
+        "maxLambdaSize": "15mb"
+      }
     }
   ],
   "routes": [
@@ -15,5 +24,10 @@
   ],
   "env": {
     "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "PRISMA_GENERATE": "true"
+    }
   }
 }
