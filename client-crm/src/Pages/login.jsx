@@ -36,7 +36,7 @@ const Login = () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
       // change the port address asper your env file (if you have)
-      const res = await fetch("http://localhost:3333/api/logIn", {
+      const res = await fetch("https://our-crm-website.vercel.app/api/logIn", {
 
         method: "POST",
         headers: {
