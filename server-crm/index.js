@@ -25,14 +25,13 @@ import updatePassword from "./middleware/updatePassword.middleware.js";
 import jwtTokenMiddleware from "./middleware/jwtoken.middleware.js"; 
 
 const app = express();
-// app.use(cors({
-//   origin: 'http://localhost:5173', 
-//   credentials: true,
-//   exposedHeaders: ['Content-Disposition'] 
-// }));
-// app.use(express.json()); 
-app.use(cors())
-app.use(express.json())
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  credentials: true,
+  exposedHeaders: ['Content-Disposition'] 
+}));
+app.use(express.json()); 
+
 const port =  3333;
 
 connectDB();
