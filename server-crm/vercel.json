@@ -31,7 +31,7 @@
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "*"
+          "value": "http://localhost:5173"
         },
         {
           "key": "Access-Control-Allow-Methods",
@@ -40,6 +40,10 @@
         {
           "key": "Access-Control-Allow-Headers",
           "value": "X-Requested-With, Content-Type, Accept, Authorization"
+        },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
         }
       ]
     }
@@ -51,6 +55,6 @@
     }
   ],
   "regions": ["iad1"],
-  "buildCommand": "prisma generate && prisma db push",
-  "installCommand": "npm install && npx prisma generate"
+  "buildCommand": "npx prisma generate",
+  "installCommand": "npm install"
 }
