@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 import React, { useState, lazy, Suspense } from 'react';
@@ -47,7 +46,7 @@ const Login = () => {
 
 
       // change the port address asper your env file (if you have)
-      const response = await axios.post("api/api/logIn", 
+      const response = await axios.post("/api/logIn", 
         {
           email: formData.email,
           username: formData.username, 
@@ -168,4 +167,3 @@ const Login = () => {
 };
 
 export default React.memo(Login);
-
