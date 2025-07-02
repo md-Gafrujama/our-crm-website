@@ -26,7 +26,7 @@ import jwtTokenMiddleware from "./middleware/jwtoken.middleware.js";
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: 'https://our-crm-website-dzen.vercel.app', 
   credentials: true,
   exposedHeaders: ['Content-Disposition'] 
 }));
