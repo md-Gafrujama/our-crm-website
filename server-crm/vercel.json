@@ -9,9 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.js"
+      "dest": "index.js"
     }
-  ],
-  "buildCommand": "npm run build",
-  "installCommand": "npm install"
+  ]
 }
