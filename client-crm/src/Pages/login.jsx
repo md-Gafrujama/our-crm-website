@@ -1,3 +1,8 @@
+
+
+
+
+import axios from 'axios';
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,31 +37,30 @@ const Login = () => {
     
     try {
       console.log('Attempting login with:', formData);
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const source = axios.CancelToken.source();
+    const timeoutId = setTimeout(() => {
+      source.cancel('Request timed out. Please try again.');
+    }, 10000); 
 
       // change the port address asper your env file (if you have)
-      const res = await fetch("https://our-crm-website.vercel.app/api/logIn", {
-
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      const response = await axios.post("api/api/logIn", 
+        {
           email: formData.email,
           username: formData.username, 
           password: formData.password
-        }),
-        signal: controller.signal
+        },
+        {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        
+        cancelToken: source.token
       });
 
       clearTimeout(timeoutId);
 
-      const data = await res.json();
+      const data = response.data;
       
-      if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
 
       if (data.token) {
         localStorage.setItem('token', data.token);

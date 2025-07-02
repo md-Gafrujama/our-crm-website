@@ -19,6 +19,8 @@ import LeadsActivity from './Pages/LeadsActivity.jsx';
 import AlertsandReminderForm from './Components/AlertsandReminderForm.jsx';
 import Quoreb2b from './Pages/Quoreb2b.jsx';
 import Comparebazar from './Pages/Comparebazar.jsx';
+import ContactQuore from './Pages/ContactQuore.jsx';
+import QuoreandCompareComments from './Pages/QuoreandCompareComments.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("loggedIn") === "true");
@@ -79,6 +81,7 @@ function App() {
             <Route path="/forgetPassword" element={ <ForgetPassword/>} />
             <Route path="/quorecomment" element={<Quoreb2b />} />
             <Route path="/comparebazarcomment" element={<Comparebazar />} />
+            <Route path="/contactquore" element={<ContactQuore />} />
 
             {/* OTP Component tabhi navigate hoga , when otp  is sent */}
 
@@ -96,7 +99,7 @@ function App() {
           <Route path="/add-leads-as-admin" element={<AddLeadsForm />} />
           <Route path="/alerts-and-reminder-admin" element={<AlertsandReminderForm />} />
           <Route path="/leadsactivity" element={<LeadsActivity />} />
-          
+          <Route path="/quore-compare-comments" element={<QuoreandCompareComments />} />
         </Route>
 
         {/* Fallback */}

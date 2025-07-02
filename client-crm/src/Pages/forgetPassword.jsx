@@ -1,5 +1,6 @@
 import React, { useState, Suspense, lazy } from "react";
 import { useNavigate } from 'react-router-dom';
+import axios from "axios";
 
 // Lazy load heavy components (example - if you had any)
 // const HeavyComponent = lazy(() => import('./HeavyComponent'));
@@ -23,37 +24,44 @@ const ForgetPassword = () => {
       return;
     }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+   try {
+    // Create a CancelToken source for timeout functionality
+    const source = axios.CancelToken.source();
+    const timeoutId = setTimeout(() => {
+      source.cancel('Request timed out. Please try again.');
+    }, 10000); // 10s timeout
 
-      const response = await fetch("http://localhost:3333/api/checkingOTP/send", {
-        method: "POST",
+    const response = await axios.post(
+      "api/api/checkingOTP/send",
+      { email },
+      {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const data = await response.json();
-        setMessage(data.message || "Password reset instructions sent to your email.");
-        localStorage.setItem("resetingPass", email);
-        localStorage.setItem("emailSent", "true"); // local storage me ek flag set kiya
-        setTimeout(() => navigate('/otp'), 1500);
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Failed to send password reset instructions.");
+        cancelToken: source.token
       }
-    } catch (err) {
-      setError(err.name === 'AbortError' 
-        ? "Request timed out. Please try again." 
-        : "An error occurred. Please try again later.");
-    } finally {
-      setIsLoading(false);
+    );
+
+    clearTimeout(timeoutId);
+
+    // With axios, successful responses (2xx) come here automatically
+    setMessage(response.data.message || "Password reset instructions sent to your email.");
+    localStorage.setItem("resetingPass", email);
+    localStorage.setItem("emailSent", "true");
+    setTimeout(() => navigate('/otp'), 1500);
+
+  }
+ catch (err) {
+    if (axios.isCancel(err)) {
+      setError(err.message); // "Request timed out. Please try again."
+    } else {
+      // Handle other errors
+      const errorMessage = err.response?.data?.message || 
+                         "An error occurred. Please try again later.";
+      setError(errorMessage);
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <Suspense fallback={<div style={{

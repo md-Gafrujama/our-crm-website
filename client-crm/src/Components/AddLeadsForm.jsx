@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import axios from 'axios';
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
 
 const AddLeadsForm = () => {
@@ -65,16 +65,14 @@ const AddLeadsForm = () => {
         notes: formData.notesforfuture,
       };
 
-      const res = await fetch("http://localhost:3333/api/leads", {
-        method: 'POST',
+      const response = await axios.post("api/api/leads", 
+        body, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
       });
 
-      const responseData = await res.json();
       toast.success("Lead Created Successfully!", {
       position: "top-right",
       autoClose: 5000,

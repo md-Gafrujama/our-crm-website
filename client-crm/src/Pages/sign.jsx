@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import axios from 'axios';
 
 // Lazy load components and icons
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
@@ -81,23 +81,14 @@ const handleSubmit = async (e) => {
       formDataToSend.append('profilePhoto', formData.profilePhoto);
     }
 
-    const res = await fetch("http://localhost:3333/api/signUp", {
-      method: 'POST',
-      body: formDataToSend,
+    const response = await axios.post("api/api/signUp", 
+      formDataToSend,
+      {
+          headers: {
+          'Content-Type': 'multipart/form-data' 
+        }
     });
 
-    if (!res.ok) {
-      const errorText = await res.text();
-      let errorData;
-      try {
-        errorData = JSON.parse(errorText);
-      } catch {
-        throw new Error(errorText || "Registration failed");
-      }
-      throw new Error(errorData.message || "Registration failed");
-    }
-
-    const data = await res.json();
     toast.success("Account created successfully!", {
                   position: "top-right",
                   autoClose: 5000,

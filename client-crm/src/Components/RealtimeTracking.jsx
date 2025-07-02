@@ -1,7 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import axios from 'axios';
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
 
 const RealtimeTracking = () => {
@@ -37,16 +37,14 @@ const RealtimeTracking = () => {
         phoneNumber: formData.phone,
       };
 
-      const res = await fetch("http://localhost:3333/api/realtimetracking", {
-        method: 'POST',
+      const response = await axios.post("api/api/realtimetracking", {
+        body,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
+        }
       });
 
-      const responseData = await res.json();
       toast.success("Realtime Tracking done Successfully!", {
       position: "top-right",
       autoClose: 5000,

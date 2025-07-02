@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import EditUser from './EditUser';
+import axios from 'axios';
 
 const AllUsers = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AllUsers = () => {
       throw new Error('Please login to view users');
     }
 
-    const response = await fetch('http://localhost:3333/api/allUser', {
+    const response = await axios.get('/api/api/allUser', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -29,12 +30,7 @@ const AllUsers = () => {
       throw new Error('Session expired. Please login again.');
     }
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch users');
-    }
-
-    const data = await response.json();
-    setUsers(data);
+    setUsers(response.data);
   } catch (err) {
     setError(err.message);
     if (err.message.includes('Session expired')) {

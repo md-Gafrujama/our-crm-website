@@ -1774,27 +1774,21 @@ import { toast } from 'react-toastify';
 import AddLeadsForm from '../Components/AddLeadsForm';
 import AlertsandReminderForm from '../Components/AlertsandReminderForm';
 import RealtimeTracking from '../Components/RealtimeTracking';
+import axios from 'axios';
 
 const download = async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await fetch('http://localhost:3333/api/downloadLeads', {
-      method: 'GET',
+    const response = await axios.get('api/api/downloadLeads', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
-      credentials: 'include' 
+      withCredentials: true, 
+      responseType: 'blob'
     });
 
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Server responded with status ${response.status}`);
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
 
     const a = document.createElement('a');
     a.href = url;
@@ -1807,8 +1801,27 @@ const download = async () => {
       window.URL.revokeObjectURL(url);
     }, 100);
   } catch (error) {
-    console.error('Download error:', error);
-    alert(`Download failed: ${error.message}`);
+   console.error('Download error:', error);
+    
+    // Enhanced error handling for blob responses
+    if (error.response && error.response.data instanceof Blob) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const errorData = JSON.parse(reader.result);
+          alert(`Download failed: ${errorData.message || error.response.statusText}`);
+        } catch {
+          alert(`Download failed: ${error.response.statusText}`);
+        }
+      };
+      reader.readAsText(error.response.data);
+    } else {
+      const errorMessage = error.response?.data?.message || 
+                         error.response?.statusText || 
+                         error.message || 
+                         'Download failed';
+      alert(`Download failed: ${errorMessage}`);
+    }
   }
 };
 
@@ -2334,118 +2347,121 @@ const [confirmPassword, setConfirmPassword] = useState('');
   };
 
 
-  const handleSaveLead = async (updatedLead) => {
-    try {
-      setIsSaving(true);
-      setApiError(null);
+ const handleSaveLead = async (updatedLead) => {
+  try {
+    setIsSaving(true);
+    setApiError(null);
 
-      if (!updatedLead.id) {
-        throw new Error('Lead ID is missing. Cannot update lead.');
-      }
+    if (!updatedLead.id) {
+      throw new Error('Lead ID is missing. Cannot update lead.');
+    }
 
-      const token = localStorage.getItem('token');
-      const response = await fetch(
-        `http://localhost:3333/api/udleads/update-lead/${updatedLead.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedLead),
+    const token = localStorage.getItem('token');
+    
+    // Update lead with Axios
+    await axios.put(
+      `api/api/udleads/update-lead/${updatedLead.id}`,
+      updatedLead,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || "Lead update failed");
       }
+    );
 
     setEditPopupOpen(false);
-    toast.success("Leads updated successfully!", {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  style: { fontSize: '1.2rem' }, 
-                });
+    toast.success("Lead updated successfully!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      style: { fontSize: '1.2rem' }, 
+    });
 
-      // Refresh leads data
-      const leadsResponse = await fetch("http://localhost:3333/api/loggedData", {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await leadsResponse.json();
-      setLeadsData(data.data);
-    } catch (err) {
-      console.error("Lead update error:", err);
-      setApiError(err.message);
-      toast.error(err.message || "Failed to update lead", {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  style: { fontSize: '1.2rem' }, 
-                });
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    // Refresh leads data with Axios
+    const { data } = await axios.get("api/api/loggedData", {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    setLeadsData(data.data);
 
-  const handleDeleteLead = async (leadId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(
-        `http://localhost:3333/api/udleads/delete-lead/${leadId}`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
+  } catch (err) {
+    console.error("Lead update error:", err);
+    
+    // Enhanced error handling with Axios
+    const errorMessage = err.response?.data?.message || 
+                       err.message || 
+                       "Failed to update lead";
+    
+    setApiError(errorMessage);
+    toast.error(errorMessage, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      style: { fontSize: '1.2rem' }, 
+    });
+  } finally {
+    setIsSaving(false);
+  }
+};
+
+const handleDeleteLead = async (leadId) => {
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Delete lead with Axios
+    await axios.delete(
+      `api/api/udleads/delete-lead/${leadId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      );
-
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || "Lead deletion failed");
       }
+    );
 
     setDeletePopupOpen(false);
     toast.success("Lead deleted successfully!", {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  style: { fontSize: '1.2rem' }, 
-                });
-    
-    // Refresh leads data
-    const leadsResponse = await fetch("http://localhost:3333/api/loggedData", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      style: { fontSize: '1.2rem' }, 
+    });
+
+    // Refresh leads data with Axios
+    const { data } = await axios.get("api/api/loggedData", {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    const data = await leadsResponse.json();
     setLeadsData(data.data);
+
   } catch (err) {
     console.error("Lead deletion error:", err);
-    toast.error(err.message || "Failed to delete lead", {
-                  position: "top-right",
-                  autoClose: 5000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                  style: { fontSize: '1.2rem' }, 
-                });
+    
+    // Enhanced error handling with Axios
+    const errorMessage = err.response?.data?.message || 
+                       err.message || 
+                       "Failed to delete lead";
+    
+    toast.error(errorMessage, {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      style: { fontSize: '1.2rem' }, 
+    });
   }
 };
 
@@ -2493,73 +2509,74 @@ const [confirmPassword, setConfirmPassword] = useState('');
 
   // UserProfile.jsx
   useEffect(() => {
-    const loadUserProfile = async () => {
-      try {
-        console.group('[UserProfile] Loading User Data');
+  const loadUserProfile = async () => {
+    try {
+      console.group('[UserProfile] Loading User Data');
 
-        // 1. Get stored credentials
-        const token = localStorage.getItem('token');
-        const storedUserId = localStorage.getItem('userId');
-        const storedUsername = localStorage.getItem('username');
+      // 1. Get stored credentials
+      const token = localStorage.getItem('token');
+      const storedUserId = localStorage.getItem('userId');
+      const storedUsername = localStorage.getItem('username');
 
-        console.log('Stored credentials:', {
-          token: token ? 'exists' : 'missing',
-          userId: storedUserId,
-          username: storedUsername
-        });
+      console.log('Stored credentials:', {
+        token: token ? 'exists' : 'missing',
+        userId: storedUserId,
+        username: storedUsername
+      });
 
-        if (!token || !storedUserId) {
-          throw new Error('Missing authentication data');
-        }
-
-        console.log('Fetching user data...');
-        const usersResponse = await fetch("http://localhost:3333/api/allUser", {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!usersResponse.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-
-        const allUsers = await usersResponse.json();
-        console.log('Received users:', allUsers);
-
-        // 3. Find matching user
-        const matchedUser = allUsers.find(user =>
-          user.id === storedUserId &&
-          user.username === storedUsername
-        );
-
-        if (!matchedUser) {
-          console.error('No matching user found. Available users:',
-            allUsers.map(u => ({ id: u.id, username: u.username })));
-          throw new Error('User data mismatch');
-        }
-
-        console.log('Matched user:', matchedUser);
-        setCurrentUser(matchedUser);
-        setLoading(false);
-
-        console.groupEnd();
-      } catch (error) {
-        console.error('Profile loading error:', error);
-        toast.error("Failed to load profile data", {
-                      position: "top-right",
-                      autoClose: 5000,
-                      hideProgressBar: false,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      style: { fontSize: '1.2rem' }, 
-                    });
-        setLoading(false);
-        onLogout();
+      if (!token || !storedUserId) {
+        throw new Error('Missing authentication data');
       }
-    };
 
-    loadUserProfile();
-  }, [onLogout]);
+      console.log('Fetching user data...');
+      const response = await axios.get("api/api/allUser", {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const allUsers = response.data;
+      console.log('Received users:', allUsers);
+
+      // 3. Find matching user
+      const matchedUser = allUsers.find(user =>
+        user.id === storedUserId &&
+        user.username === storedUsername
+      );
+
+      if (!matchedUser) {
+        console.error('No matching user found. Available users:',
+          allUsers.map(u => ({ id: u.id, username: u.username })));
+        throw new Error('User data mismatch');
+      }
+
+      console.log('Matched user:', matchedUser);
+      setCurrentUser(matchedUser);
+      setLoading(false);
+
+      console.groupEnd();
+    } catch (error) {
+      console.error('Profile loading error:', error);
+      
+      const errorMessage = error.response?.data?.message || 
+                         error.message || 
+                         "Failed to load profile data";
+      
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        style: { fontSize: '1.2rem' }, 
+      });
+      setLoading(false);
+      onLogout();
+    }
+  };
+
+  loadUserProfile();
+}, [onLogout]);
 
 
 
@@ -2630,60 +2647,61 @@ const [confirmPassword, setConfirmPassword] = useState('');
 
 
   // the leads of the user
-  useEffect(() => {
+useEffect(() => {
   const fetchLeadsData = async () => {
     if (activeTab === 'leads') {
       try {
         setLeadsLoading(true);
         const token = localStorage.getItem('token');
+        
         if (!token) {
           toast.error("Please log in to view leads", {
-                        position: "top-right",
-                        autoClose: 5000,
-                        hideProgressBar: false,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                        style: { fontSize: '1.2rem' }, 
-                      });
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            style: { fontSize: '1.2rem' }, 
+          });
           navigate('/login');
           return;
         }
 
-          const response = await fetch("http://localhost:3333/api/loggedData", {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to fetch leads data');
+        const response = await axios.get("api/api/loggedData", {
+          headers: {
+            'Authorization': `Bearer ${token}`
           }
+        });
 
-        const data = await response.json();
-        console.log('Leads data:', data); // Debug log
-        setLeadsData(data.data);
+        console.log('Leads data:', response.data); // Debug log
+        setLeadsData(response.data.data);
+        
       } catch (error) {
         console.error('Error fetching leads:', error);
-        toast.error(ErrorEvent.message || "Failed to load leads", {
-                      position: "top-right",
-                      autoClose: 5000,
-                      hideProgressBar: false,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      style: { fontSize: '1.2rem' }, 
-                    });
+        
+        const errorMessage = error.response?.data?.message || 
+                           "Failed to load leads";
+        
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          style: { fontSize: '1.2rem' }, 
+        });
       } finally {
         setLeadsLoading(false);
       }
     }
   };
 
-    fetchLeadsData();
-  }, [activeTab, navigate]);
+  fetchLeadsData();
+}, [activeTab, navigate]);
 
 
   if (loading) {
@@ -2783,14 +2801,6 @@ const changepass = async (data) => {
                 >
                   Alerts And Reminder
                 </button>
-
-                <button
-                  onClick={() => setActiveTab('phonetrackingandanalysis')}
-                  className={`cursor-pointer w-full text-left px-4 py-2 rounded-lg ${activeTab === 'phonetrackingandanalysis' ? 'bg-blue-50 text-[#ff8633]' : 'text-gray-600 hover:bg-gray-100'}`}
-                >
-                  Phone Tracking And Analysis
-                </button>
-
 
                 <button
                   onClick={() => setActiveTab('report')}
@@ -3094,32 +3104,31 @@ const changepass = async (data) => {
           }
 
           try {
-            const token = localStorage.getItem('token');
-            const response = await fetch("http://localhost:3333/api/changePass", {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({
-                currentPassword,
-                newPassword
-              })
-            });
+  const token = localStorage.getItem('token');
+  const response = await axios.post(
+    "api/api/changePass",
+    {
+      currentPassword,
+      newPassword
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
 
-            if (!response.ok) {
-              const error = await response.json();
-              throw new Error(error.message || "Password change failed");
-            }
+  toast.success("Password changed successfully!");
+  setCurrentPassword('');
+  setNewPassword('');
+  setConfirmPassword('');
 
-            toast.success("Password changed successfully!");
-            setCurrentPassword('');
-            setNewPassword('');
-            setConfirmPassword('');
-          } catch (error) {
-            console.error('Password change error:', error);
-            toast.error(error.message || "Failed to change password");
-          }
+} catch (error) {
+  const errorMessage = error.response?.data?.message || 
+                     "Password change failed";
+  throw new Error(errorMessage);
+} 
         }}>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>

@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
@@ -7,22 +8,15 @@ const download = async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await fetch('http://localhost:3333/api/downloadLeads', {
-      method: 'GET',
+    const response = await axios.get('api/api/downloadLeads', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
-      credentials: 'include' 
+      withCredentials: true,
+      responseType: 'blob'
     });
 
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Server responded with status ${response.status}`);
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(new Blob([response.data]));
 
     const a = document.createElement('a');
     a.href = url;
@@ -98,45 +92,43 @@ const LeadsActivity = () => {
 
       const token = localStorage.getItem('token');
 
-      const response = await fetch(
-        `http://localhost:3333/api/udleads/update-lead/${updatedLead.id}`,
+      const response = await axios.put(
+        `api/api/udleads/update-lead/${updatedLead.id}`,
+        payload,
         {
-          method: 'PUT',
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          }
         }
       );
-      const responseData = await response.json();
-      console.log('Response data:', responseData);
-
-      if (!response.ok) {
-        setApiError(responseData.error || 'Failed to update lead');
-        throw new Error(responseData.error || 'Failed to update lead');
-      }
+      console.log('Response data:', response.data);
 
       setEditPopupOpen(false);
       await fetchData();
     } catch (error) {
-      console.error('Error saving lead:', error);
-      setApiError(error.message);
-      alert('Failed to update lead: ' + error.message);
-    } finally {
+       console.error('Error saving lead:', error);
+    
+    // Enhanced error handling with Axios
+    const errorMessage = error.response?.data?.error || 
+                        error.message || 
+                        'Failed to update lead';
+    
+    setApiError(errorMessage);
+    alert('Failed to update lead: ' + errorMessage);
+    } 
+    finally {
       setIsSaving(false);
     }
   };
 
   // deleting lead
   const handleDeleteLead = async (leadId) => {
-
-
+    try {
     const token = localStorage.getItem('token');
-    const response = await fetch(
-      `http://localhost:3333/api/udleads/delete-lead/${leadId}`,
+    await axios.delete(
+      `api/api/udleads/delete-lead/${leadId}`,
       {
-        method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -144,85 +136,20 @@ const LeadsActivity = () => {
       }
     );
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to delete lead');
-    }
-
     setDeletePopupOpen(false);
     fetchData();
-
+  }
+   catch (error) {
+    const errorMessage = error.response?.data?.error || 
+                       error.message || 
+                       'Failed to delete lead';
+    throw new Error(errorMessage);
+  }
   };
 
 
 
-  // hardcoded
-  // const fetchData = useCallback(async () => {
-  //   try {
-  //     setLoading(true);
-  //     setError(null);
-      
-  //     // Step 1: Login to get token
-  //     const loginResponse = await fetch("http://localhost:3333/api/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         email: "admin@gmail.com",
-  //         username: "admin404",
-  //         password: "admin404",
-  //       }),
-  //     });
-
-  //     if (!loginResponse.ok) {
-  //       throw new Error(`Login failed with status: ${loginResponse.status}`);
-  //     }
-
-  //     const loginData = await loginResponse.json();
-  //     const token = loginData.token;
-  //     if (!token) {
-  //       throw new Error("No token received in login response");
-  //     }
-
-  //     // Step 2: Fetch recent data with token
-  //     const recentResponse = await fetch("http://localhost:3333/api/recent", {
-  //       method: "GET",
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     if (!recentResponse.ok) {
-  //       throw new Error(
-  //         `Recent data fetch failed with status: ${recentResponse.status}`
-  //       );
-  //     }
-
-  //     const recentData = await recentResponse.json();
-
-  //     if (!recentData.leads) {
-  //       throw new Error("Incomplete leads data received from API");
-  //     }
-
-  //     setLeadsData(recentData.leads);
-  //     setStats({
-  //       userNumber: recentData.userNumber || 0,
-  //       leadsNumber: recentData.leadsNumber || 0,
-  //       company: recentData.company || 0,
-  //     });
-  //   } catch (err) {
-  //     console.error("Error in data fetching:", err);
-  //     setError(err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
-
-
   // dynamic
-  
-  
   const fetchData = useCallback(async () => {
   try {
     setLoading(true);
@@ -246,15 +173,14 @@ const LeadsActivity = () => {
     }
 
     // 2. Fetch recent data with the token
-    const recentResponse = await fetch("http://localhost:3333/api/recent", {
-      method: "GET",
+    const response = await axios.get("api/api/recent", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
     // 3. Handle unauthorized (401) responses
-    if (recentResponse.status === 401) {
+    if (response.status === 401) {
       localStorage.removeItem('token');
       toast.error("Session expired please login again", {
                     position: "top-right",
@@ -270,11 +196,7 @@ const LeadsActivity = () => {
       return;
     }
 
-    if (!recentResponse.ok) {
-      throw new Error(`Request failed with status: ${recentResponse.status}`);
-    }
-
-    const recentData = await recentResponse.json();
+    const recentData = await response.data;
 
     if (!recentData.leads) {
       throw new Error("Incomplete leads data received from API");
@@ -288,7 +210,15 @@ const LeadsActivity = () => {
     });
   } catch (err) {
     console.error("Error in data fetching:", err);
-    setError(err.message);
+   const errorMessage = err.response?.status === 401 
+      ? "Session expired please login again"
+      : err.response?.data?.message 
+      ? err.response.data.message
+      : err.message 
+      ? err.message
+      : "Failed to fetch data";
+
+    setError(errorMessage);
     toast.error("Failed to fetch data" || err.message , {
                   position: "top-right",
                   autoClose: 5000,
@@ -299,6 +229,10 @@ const LeadsActivity = () => {
                   progress: undefined,
                   style: { fontSize: '1.2rem' }, 
                 });
+                if (err.response?.status === 401) {
+      localStorage.removeItem('token');
+      navigate('/login');
+    }
   } finally {
     setLoading(false);
   }

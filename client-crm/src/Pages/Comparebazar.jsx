@@ -1,6 +1,7 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
 
@@ -39,15 +40,16 @@ const Comparebazar = () => {
 
       console.log(body)
 
-      const res = await fetch("http://localhost:3333/api/compareb/form", {
-        method: 'POST',
+    const res = await axios.post(
+      "/api/api/compareb/form",
+      body,
+      {
         headers: {
-        'Content-Type': 'application/json'  
-        },
-        body: JSON.stringify(body),
-      });
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-      const responseData = await res.json();
       toast.success("Comment added Successfully!", {
       position: "top-right",
       autoClose: 5000,
@@ -70,6 +72,7 @@ const Comparebazar = () => {
       console.error("Error details:", {
         message: e.message,
         stack: e.stack,
+        response: e.response?.data
       });
       toast.error(e.message || "Comment  Failed. Please try again.");
     } finally {
@@ -165,7 +168,7 @@ const Comparebazar = () => {
               onChange={handleChange}
               required
               className="w-full px-4 py-3 text-center rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff8633] focus:border-transparent transition-all"
-              placeholder='Eg. Need to maintain it in future'
+              placeholder='Type your comment...'
               autoComplete="comment"
             />
           </div>

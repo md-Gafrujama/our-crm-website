@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(['', '', '', '','','']);
@@ -28,18 +29,14 @@ const OTPPage = () => {
             console.log("Entered OTP:", enteredOtp);
 
             if (enteredOtp.length === 6) {
-                const res = await fetch("http://localhost:3333/api/checkingOTP", {
-                    method: "POST",
+                const response = await axios.post("api/api/checkingOTP", 
+                  { otp: enteredOtp },
+                  {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ otp: enteredOtp }) 
                 });
 
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.message || "Something went wrong");
-                }
                   localStorage.removeItem("emailSent"); //  email flag ko unset kiya
                 alert('OTP verified successfully! Redirecting to password reset...');
                 

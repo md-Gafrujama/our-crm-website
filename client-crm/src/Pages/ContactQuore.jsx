@@ -5,13 +5,15 @@ import axios from 'axios';
 
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
 
-const Quoreb2b = () => {
+const ContactQuore = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    comment: '',
+    email: '',
+    phone: '',
+    message: '',
   });
 
   const handleChange = React.useCallback((e) => {
@@ -28,30 +30,29 @@ const Quoreb2b = () => {
     navigate('/dashboard');
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsSubmitting(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      
+      const body = {
+        customerFirstName: formData.firstName,
+        customerLastName: formData.lastName,
+        emailAddress: formData.email,
+        phoneNumber: formData.phone,
+        message: formData.message,
+      };
 
-  try {
-    const body = {
-      userFirstName: formData.firstName,
-      userLastName: formData.lastName,
-      comment: formData.comment,
-    };
-
-    console.log("Sending body:", body);
-
-    const response = await axios.post("api/api/quareb2b/form", 
+      const res = await axios.post("api/api/contactquore",
       body,
       {
-      headers: {
-        'Content-Type': 'application/json'  
+        headers: {
+          'Content-Type': 'application/json'
+        }
       }
-    }
-  );
+    );
 
-
-    toast.success("Comment added Successfully!", {
+      toast.success("Lead Created Successfully!", {
       position: "top-right",
       autoClose: 5000,
       hideProgressBar: false,
@@ -59,27 +60,26 @@ const Quoreb2b = () => {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      style: { fontSize: '1.2rem' },
+      style: { fontSize: '1.2rem' }, // Increased font size
     });
-
-    const userType = localStorage.getItem('userType');
-    if (userType === 'user') {
-      setTimeout(() => {
-        navigate("/userProfile");
-        window.location.reload(); 
-      }, 2000);
-    } else if (userType === 'admin') {
-      setTimeout(() => navigate("/dashboard"), 2000);
+    const userType = localStorage.getItem('userType'); 
+   if (userType === 'user') {
+   setTimeout(() => navigate("/userProfile"), 2000);
+   window.location.reload();
+  } else if (userType === 'admin') {
+    setTimeout(() => navigate("/dashboard"), 2000);
+  }     
+    } catch (e) {
+      console.error("Lead Creation Failed - Full Error:", e);
+      console.error("Error details:", {
+        message: e.message,
+        stack: e.stack,
+      });
+      toast.error(e.message || "Lead Creation Failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-  } catch (e) {
-    console.error("Comment Failed - Full Error:", e);
-    toast.error(e.message || "Comment Failed. Please try again.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+  };
 
   return (
     <>
@@ -116,10 +116,8 @@ const Quoreb2b = () => {
 )}
           </div>
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Quore Comments</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-2">Contact Quore b2b</h2>
           </div>
-
-
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -156,21 +154,53 @@ const Quoreb2b = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 text-center rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff8633] focus:border-transparent transition-all"
+                placeholder="your@email.com"
+                autoComplete="email"
+              />
+            </div>
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-lg text-center border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff8633] focus:border-transparent transition-all"
+                placeholder="+1 (123) 456-7890"
+                autoComplete="tel"
+              />
+            </div>
+          </div>
 
-         <div className="mb-4">
+
+
+
+          <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Comment
+              Message
             </label>
             <input
-              type="comment"
-              id="comment"
-              name="comment"
-              value={formData.comment}
+              type="text"
+              id="message"
+              name="message"
+              value={formData.message}
               onChange={handleChange}
               required
               className="w-full px-4 py-3 text-center rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff8633] focus:border-transparent transition-all"
-              placeholder='Type your comment...'
-              autoComplete="comment"
+              placeholder='Type your Message..'
+              autoComplete="message"
             />
           </div>
 
@@ -182,7 +212,7 @@ const Quoreb2b = () => {
             className={`w-full cursor-pointer bg-gradient-to-r from-[#ff8633] to-[#ff9a52] text-white py-3 rounded-lg font-medium hover:from-[#e6732b] hover:to-[#e6732b] transition-all shadow-md hover:shadow-lg active:scale-95 transform ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
               }`}
           >
-            {isSubmitting ? 'Adding Comment...' : 'Comment'}
+            {isSubmitting ? 'Sending Message...' : 'Send Message'}
           </button>
         </form>
       </Suspense>
@@ -191,4 +221,4 @@ const Quoreb2b = () => {
   );
 };
 
-export default React.memo(Quoreb2b);
+export default React.memo(ContactQuore);

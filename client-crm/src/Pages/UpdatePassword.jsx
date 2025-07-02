@@ -1,6 +1,6 @@
 import { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import axios from 'axios';
 
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
@@ -38,22 +38,18 @@ const UpdatePassword = () => {
       setIsSubmitting(true);
       setErrorMessage('');
       try {
-        const response = await fetch('http://localhost:3333/updatePassword', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        const response = await axios.put('api/updatePassword', 
+          {
             email,
             newPassword: newPassword,
             confirmPassword: confirmPassword,
-          }),
+          },
+          {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          
         });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to update password');
-        }
 
         setSuccessMessage('Password updated successfully!');
         setNewPassword('');
