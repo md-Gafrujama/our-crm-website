@@ -9,8 +9,7 @@ const router = express.Router();
 
 const JWT_SECRET = process.env.JWT_SECRET; 
 
-// Changed from "/" to "/logIn" to match your frontend endpoint
-router.post("/logIn", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { email, username, password } = req.body;
     if ((!email && !username) || !password) {
@@ -19,6 +18,7 @@ router.post("/logIn", async (req, res) => {
       });
     }
 
+  
     // gmail users signin nhi kar payenge
     // const pp = email.split('@')
     // if(pp[1] === "gmail.com")
@@ -88,7 +88,6 @@ router.post("/logIn", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
-    
     return res.status(200).json({
       message: "Login successful (DB)",
       user: {

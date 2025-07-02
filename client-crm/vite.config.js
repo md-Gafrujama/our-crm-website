@@ -1,3 +1,36 @@
+// import { defineConfig } from 'vite'
+// import react from '@vitejs/plugin-react'
+
+
+// // https://vite.dev/config/
+// export default defineConfig({
+//   plugins: [react()],
+// })
+
+
+
+
+
+
+
+// import { defineConfig } from 'vite';
+// import react from '@vitejs/plugin-react';
+// import dotenv from 'dotenv';
+// const viteBaseUrl = process.env.VITE_BASE_URL || 'http://localhost:3000';
+// const frontendPort = Number(new URL(viteBaseUrl).port) || 3000;
+
+
+// dotenv.config();
+// export default defineConfig({
+//   plugins: [react()],
+//   server: {
+//     port: frontendPort,
+//   },
+// });
+
+
+
+
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dotenv from 'dotenv';
@@ -9,17 +42,13 @@ export default defineConfig({
   server: {
     port: parseInt(process.env.VITE_PORT || '5173', 10),
     proxy: {
-      '/api': {
+  '/api': {
+    target: 'https://testing-crm-seven.vercel.app',
+    changeOrigin: true,
+    secure: false,
+    rewrite: (path) => path.replace(/^\/api/, '')
+  }
+}
 
-        target: 'https://our-crm-website.vercel.app/', // Your Vercel backend URL
-
-
-        changeOrigin: true,
-        secure: true,
-        // Do NOT rewrite: keep /api for backend route matching
-
-
-      }
-    }
   }
 });
