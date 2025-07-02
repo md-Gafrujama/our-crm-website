@@ -7,7 +7,18 @@ import dotenv from "dotenv";
 dotenv.config();
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET; 
+const JWT_SECRET = process.env.JWT_SECRET;
+
+// CORS middleware for this route
+router.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://our-crm-website-v1hn.vercel.app");
+  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 router.post("/", async (req, res) => {
   try {
@@ -18,7 +29,6 @@ router.post("/", async (req, res) => {
       });
     }
 
-  
     // gmail users signin nhi kar payenge
     // const pp = email.split('@')
     // if(pp[1] === "gmail.com")

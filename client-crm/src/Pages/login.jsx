@@ -30,61 +30,66 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    try {
-      console.log('Attempting login with:', formData);
-      const source = axios.CancelToken.source();
+
+    const source = axios.CancelToken.source();
     const timeoutId = setTimeout(() => {
       source.cancel('Request timed out. Please try again.');
-    }, 10000); 
+    }, 10000);
 
-      // change the port address asper your env file (if you have)
-      const response = await axios.post("https://testing-crm-seven.vercel.app/api/api/logIn", 
+    try {
+      console.log('Attempting login with:', formData);
+
+      const response = await axios.post(
+        "https://our-crm-website.vercel.app/api/logIn",
         {
           email: formData.email,
-          username: formData.username, 
+          username: formData.username,
           password: formData.password
         },
         {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        
-        cancelToken: source.token
-      });
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          cancelToken: source.token
+        }
+      );
 
       clearTimeout(timeoutId);
 
       const data = response.data;
-      
 
       if (data.token) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('loggedIn', 'true'); 
-        localStorage.setItem('userId', data.user?.id || ''); // Store user ID
+        localStorage.setItem('loggedIn', 'true');
+        localStorage.setItem('userId', data.user?.id || '');
         localStorage.setItem('username', data.user?.username || '');
         const userType = data.userType || data.user?.role;
         localStorage.setItem('userType', userType);
 
-        console.log('Stored user data:', { // Debug log
-        token: data.token,
-        userId: data.user.id,
-        username: data.user.username,
-        userType
-      });
-  if (userType === 'admin') {
-  navigate('/dashboard', { replace: true });
-  window.location.reload();
-} else {
-  navigate('/userProfile', { replace: true });
-  // window.location.reload();
-}
+        console.log('Stored user data:', {
+          token: data.token,
+          userId: data.user.id,
+          username: data.user.username,
+          userType
+        });
+
+        if (userType === 'admin') {
+          navigate('/dashboard', { replace: true });
+          window.location.reload();
+        } else {
+          navigate('/userProfile', { replace: true });
+        }
       }
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error("Login error:", error);
-      alert(error.name === 'AbortError' 
-        ? "Request timed out. Please try again." 
-        : error.message || "Login failed. Please check your credentials.");
+      if (axios.isCancel(error)) {
+        alert("Request timed out. Please try again.");
+      } else if (error.response && error.response.data && error.response.data.message) {
+        alert(error.response.data.message);
+      } else {
+        alert("Login failed. Please check your credentials or try again later.");
+      }
     } finally {
       setIsLoading(false);
     }
