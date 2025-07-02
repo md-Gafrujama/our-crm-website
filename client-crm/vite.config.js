@@ -12,9 +12,12 @@ export default defineConfig({
       '/api': {
 
         target: 'https://our-crm-website.vercel.app/', // Your Vercel backend URL
+
+
         changeOrigin: true,
         secure: true,
         // Do NOT rewrite: keep /api for backend route matching
+
 
       }
     }
