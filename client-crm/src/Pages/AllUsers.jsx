@@ -19,7 +19,7 @@ const AllUsers = () => {
       throw new Error('Please login to view users');
     }
 
-    const response = await axios.get('/api/api/allUser', {
+    const response = await axios.get('https://our-crm-website.vercel.app/api/allUser', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
