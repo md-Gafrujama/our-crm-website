@@ -11,8 +11,9 @@ export default defineConfig({
     proxy: {
       '/api': {
 
+        target: 'https://our-crm-website.vercel.app/', // Your Vercel backend URL
 
-        target: 'https://our-crm-website-tws6.vercel.app', // Your Vercel backend URL
+
         changeOrigin: true,
         secure: true,
         // Do NOT rewrite: keep /api for backend route matching
