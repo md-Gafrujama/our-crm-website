@@ -171,14 +171,16 @@ import { useNavigate } from 'react-router-dom';
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 
-// Get API base URL from environment variable only
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+// Get API base URL from environment variable with fallback for production
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.PROD ? 'https://our-crm-website.vercel.app' : null);
 
 // Debug: Check what environment variables are available
 console.log('All env variables:', import.meta.env);
 console.log('API_BASE_URL:', API_BASE_URL);
 console.log('Mode:', import.meta.env.MODE);
 console.log('Is development?', import.meta.env.DEV);
+console.log('Is production?', import.meta.env.PROD);
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
