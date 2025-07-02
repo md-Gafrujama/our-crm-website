@@ -10,7 +10,7 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET; 
 
 // Changed from "/" to "/logIn" to match your frontend endpoint
-router.post("/logIn", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { email, username, password } = req.body;
     if ((!email && !username) || !password) {
