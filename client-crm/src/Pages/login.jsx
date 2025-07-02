@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 import React, { useState, lazy, Suspense } from 'react';
@@ -40,12 +41,13 @@ const Login = () => {
     }, 10000); 
 
 
+
       // Direct API call to production backend
       const apiUrl = '/api/logIn'; // Let Vite proxy handle it
 
-      console.log('Making request to:', apiUrl); // Debug log
 
-      const response = await axios.post(apiUrl, 
+      // change the port address asper your env file (if you have)
+      const response = await axios.post("api/api/logIn", 
         {
           email: formData.email,
           username: formData.username, 
