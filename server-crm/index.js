@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import connectDB from "./prisma/dbConnect.js";
 
 import signUp from "./api/signUp.api.js";
-import logIn from "./api/logIn.api.js";
+import logIn from "./api/login.api.js";
 import checkingOTP from "./api/checkingOTP.js";
 import userProfile from "./api/userProfile.api.js";
 import addCustomer from "./api/addCustomer.api.js";
@@ -37,7 +37,7 @@ const port =  3333;
 connectDB();
 
 app.use("/api/signUp", signUp);
-app.use("/api/logIn", logIn);
+app.use("/api/login", logIn);
 app.use("/api/checkingOTP", checkingOTP);
 app.use("/api/allUser", userProfile);
 app.use("/updatePassword", updatePassword);
