@@ -27,29 +27,13 @@ import jwtTokenMiddleware from "./middleware/jwtoken.middleware.js";
 const app = express();
 
 // Updated CORS configuration
-const allowedOrigins = [
-  'https://our-crm-website-rnhs.vercel.app',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000' // Add this if needed
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ['https://our-crm-website-rnhs.vercel.app', 'http://localhost:3000'], // Removed trailing slash
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Disposition']
+  exposedHeaders: ['Content-Disposition'] 
 }));
-
-// Handle preflight requests
-app.options('*', cors());
 
 app.use(express.json()); 
 
