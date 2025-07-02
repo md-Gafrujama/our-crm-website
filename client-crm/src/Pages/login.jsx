@@ -172,7 +172,7 @@ const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 
 // Get API URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://our-crm-website.vercel.app';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);

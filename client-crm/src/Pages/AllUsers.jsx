@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import EditUser from './EditUser';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://our-crm-website.vercel.app';
+
 const AllUsers = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
@@ -19,7 +21,7 @@ const AllUsers = () => {
       throw new Error('Please login to view users');
     }
 
-    const response = await axios.get('https://our-crm-website.vercel.app/api/allUser', {
+    const response = await axios.get(`${API_BASE_URL}/api/allUser`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
