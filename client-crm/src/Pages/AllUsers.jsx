@@ -33,7 +33,8 @@ const AllUsers = () => {
     setUsers(response.data);
   } catch (err) {
     setError(err.message);
-    
+    // if (err.message.includes('Session expired')) {
+    // }
   } finally {
     setLoading(false);
   }
