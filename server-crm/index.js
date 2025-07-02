@@ -1,152 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import CommentTableItem from '../../components/admin/CommentTableItem'
-import { useAppContext } from '../../context/AppContext'
-import toast from 'react-hot-toast'
+import express from "express";
+import "dotenv/config";
+import cors from "cors";
+import jwt from 'jsonwebtoken';
 
-const Comments = () => {
-    const [comments, setComments] = useState([])
-    const [filter, setFilter] = useState('Not Approved')
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+import connectDB from "./prisma/dbConnect.js";
 
-    const { axios } = useAppContext();
+import signUp from "./api/signUp.api.js";
+import logIn from "./api/login.api.js";
+import checkingOTP from "./api/checkingOTP.js";
+import userProfile from "./api/userProfile.api.js";
+import addCustomer from "./api/addCustomer.api.js";
+import updateUserRoutes from "./api/updateUser.js"; 
+import recentActivities from "./api/recentActivities.api.js";
+import loggedData from "./api/loggedData.api.js"
+import addLeads from "./api/addLeads.api.js"
+import udleads from "./api/udleads.api.js"
+import downloadLeadsRouter from './api/downloadLeads.api.js';
+import alertRouter from "./api/alerts&remainder.api.js";
+import changePass from "./api/changePass.api.js";
+import qb2b from "./api/qb2b.api.js"
+import compareb from "./api/compareb.api.js"
 
-    // Validate comment data structure
-    const validateComment = (comment) => {
-        return (
-            comment &&
-            typeof comment === 'object' &&
-            comment._id &&
-            typeof comment.isApproved === 'boolean'
-        )
-    }
+import updatePassword from "./middleware/updatePassword.middleware.js";
+import jwtTokenMiddleware from "./middleware/jwtoken.middleware.js"; 
 
-    const fetchComments = async () => {
-        try {
-            setLoading(true)
-            setError(null)
-            
-            const { data } = await axios.get('/api/admin/comments')
-            
-            if (data && data.success) {
-                // Validate and filter comments data
-                const validComments = Array.isArray(data.comments) 
-                    ? data.comments.filter(validateComment)
-                    : []
-                
-                if (validComments.length !== data.comments?.length) {
-                    console.warn('Some comments were filtered out due to invalid data structure')
-                }
-                
-                setComments(validComments)
-            } else {
-                const errorMessage = data?.message || 'Failed to fetch comments'
-                setError(errorMessage)
-                toast.error(errorMessage)
-            }
-        } catch (error) {
-            const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred while fetching comments'
-            setError(errorMessage)
-            toast.error(errorMessage)
-            console.error('Error fetching comments:', error)
-        } finally {
-            setLoading(false)
-        }
-    }
+const app = express();
+app.use(cors({
+  origin: 'https://our-crm-website-dzen.vercel.app', 
+  credentials: true,
+  exposedHeaders: ['Content-Disposition'] 
+}));
+app.use(express.json()); 
 
-    useEffect(() => {
-        fetchComments()
-    }, [])
+const port =  3333;
 
-    // Filter comments based on approval status
-    const filteredComments = comments.filter((comment) => {
-        if (filter === "Approved") {
-            return comment.isApproved === true
-        }
-        return comment.isApproved === false
-    })
+connectDB();
 
-    if (loading) {
-        return (
-            <div className='flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50'>
-                <div className='flex justify-center items-center h-64'>
-                    <div className='text-gray-500'>Loading comments...</div>
-                </div>
-            </div>
-        )
-    }
+app.use("/api/signUp", signUp);
+app.use("/api/login", logIn);
+app.use("/api/checkingOTP", checkingOTP);
+app.use("/api/allUser", userProfile);
+app.use("/updatePassword", updatePassword);
+app.use("/api/addCustomer", addCustomer);
+app.use("/api", updateUserRoutes); 
+app.use("/api/recent",recentActivities);
+app.use("/api/loggedData",loggedData);
+app.use("/api/leads",addLeads);
+app.use("/api/udleads",udleads);
+app.use('/api/downloadLeads', downloadLeadsRouter);
+app.use("/api/alert",alertRouter);
+app.use("/api/changePass",changePass);
+app.use("/api/quareb2b/form",qb2b);
+app.use("/api/compareb/form",compareb);
 
-    if (error) {
-        return (
-            <div className='flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50'>
-                <div className='flex justify-center items-center h-64'>
-                    <div className='text-red-500'>
-                        Error: {error}
-                        <button 
-                            onClick={fetchComments}
-                            className='ml-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+app.get("/api/protected-route", jwtTokenMiddleware, (req, res) => {
+  res.json({
+    message: 'Protected route accessed!',
+    user: req.user
+  });
+});
 
-    return (
-        <div className='flex-1 pt-5 px-5 sm:pt-12 sm:pl-16 bg-blue-50/50'>
-            <div className='flex justify-between items-center max-w-3xl'>
-                <h1>Comments ({filteredComments.length})</h1>
-                <div className='flex gap-4'>
-                    <button 
-                        onClick={() => setFilter('Approved')} 
-                        className={`shadow-custom-sm border rounded-full px-4 py-1 cursor-pointer text-xs transition-colors ${
-                            filter === 'Approved' ? 'text-primary bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                    >
-                        Approved ({comments.filter(c => c.isApproved === true).length})
-                    </button>
-                    <button 
-                        onClick={() => setFilter('Not Approved')} 
-                        className={`shadow-custom-sm border rounded-full px-4 py-1 cursor-pointer text-xs transition-colors ${
-                            filter === 'Not Approved' ? 'text-primary bg-blue-50' : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                    >
-                        Not Approved ({comments.filter(c => c.isApproved === false).length})
-                    </button>
-                </div>
-            </div>
-            
-            <div className='relative h-4/5 max-w-3xl overflow-x-auto mt-4 bg-white shadow rounded-lg scrollbar-hide'>
-                {filteredComments.length === 0 ? (
-                    <div className='flex justify-center items-center h-32 text-gray-500'>
-                        No {filter.toLowerCase()} comments found
-                    </div>
-                ) : (
-                    <table className="w-full text-sm text-gray-500">
-                        <thead className="text-xs text-gray-700 text-left uppercase bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3">Blog Title & Comment</th>
-                                <th scope="col" className="px-6 py-3 max-sm:hidden">Date</th>
-                                <th scope="col" className="px-6 py-3">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredComments.map((comment, index) => (
-                                <CommentTableItem 
-                                    key={comment._id} 
-                                    comment={comment} 
-                                    index={index + 1} 
-                                    fetchComments={fetchComments} 
-                                />
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
-        </div>
-    )
-}
 
-export default Comments
+app.get("/", (req, res) => {
+    res.send("Welcome to index page");
+});
+
+app.listen(port, () => {
+    console.log(`Server is running with port ${port}`);
+});
