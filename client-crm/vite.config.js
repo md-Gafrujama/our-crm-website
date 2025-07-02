@@ -7,13 +7,12 @@ dotenv.config();
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: parseInt( '5173' ||'https://our-crm-website-99fa.vercel.app', 10),
+    port: parseInt(process.env.PORT || '5173', 10), // Local dev server port
     proxy: {
       '/api': {
-        target: 'https://our-crm-website.vercel.app', // Remove trailing slash
+        target: process.env.VITE_API_URL || 'https://our-crm-website.vercel.app', // Backend URL
         changeOrigin: true,
         secure: true,
-        // No rewrite needed; keep /api for backend route matching
       }
     }
   }
