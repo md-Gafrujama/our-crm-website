@@ -28,11 +28,12 @@ const app = express();
 
 // Updated CORS configuration
 app.use(cors({
-  origin: ['https://testing-crm-ikxz.vercel.app','https://testing-crm-seven.vercel.app', 'http://localhost:5173'], // Removed trailing slash
+  origin: ['https://testing-crm-ikxz.vercel.app','https://testing-crm-seven.vercel.app', 'http://localhost:5173','https://our-crm-website-99fa.vercel.app'], // Removed trailing slash
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Disposition'] 
+  exposedHeaders: ['Content-Disposition'],
+  
 }));
 
 app.use(express.json()); 

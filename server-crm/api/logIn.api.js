@@ -7,20 +7,10 @@ import dotenv from "dotenv";
 dotenv.config();
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET; 
 
-// CORS middleware for this route
-router.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://our-crm-website-v1hn.vercel.app");
-  res.header("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
-});
-
-router.post("/", async (req, res) => {
+// Changed from "/" to "/logIn" to match your frontend endpoint
+router.post("/logIn", async (req, res) => {
   try {
     const { email, username, password } = req.body;
     if ((!email && !username) || !password) {
@@ -28,6 +18,47 @@ router.post("/", async (req, res) => {
         message: "Email/username and password are required"
       });
     }
+
+    // gmail users signin nhi kar payenge
+    // const pp = email.split('@')
+    // if(pp[1] === "gmail.com")
+    // {
+    //   return res.status(400).json({
+    //     message: "Invalid Email"
+    //   });
+    // }
+
+    // const isEnvAdmin =
+    //   email === process.env.ADMIN_EMAIL &&
+    //   username === process.env.ADMIN_USERNAME &&
+    //   password === process.env.ADMIN_PASSWORD;
+
+    // if (isEnvAdmin) {
+    //   const token = jwt.sign(
+    //     {
+    //       uid: "env-admin",
+    //       username: process.env.ADMIN_USERNAME,
+    //       email: process.env.ADMIN_EMAIL,
+    //       role: "admin"
+    //     },
+    //     JWT_SECRET,
+    //     { expiresIn: "1h" }
+    //   );
+
+    //   return res.status(200).json({
+    //     message: "Login successful (.env admin)",
+    //     user: {
+    //       id: "env-admin",
+    //       username: process.env.ADMIN_USERNAME,
+    //       email: process.env.ADMIN_EMAIL,
+    //       firstName: "Admin",
+    //       lastName: "User",
+    //       role: "admin"
+    //     },
+    //     token,
+    //     userType: "admin"
+    //   });
+    // }
 
     const user = await prisma.user.findFirst({
       where: {
@@ -57,6 +88,7 @@ router.post("/", async (req, res) => {
       JWT_SECRET,
       { expiresIn: "1h" }
     );
+    
     return res.status(200).json({
       message: "Login successful (DB)",
       user: {

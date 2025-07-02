@@ -43,7 +43,7 @@ export default defineConfig({
     port: parseInt(process.env.VITE_PORT || '5173', 10),
     proxy: {
   '/api': {
-    target: 'https://testing-crm-seven.vercel.app',
+    target: 'https://our-crm-website.vercel.app/',
     changeOrigin: true,
     secure: false,
     rewrite: (path) => path.replace(/^\/api/, '')
