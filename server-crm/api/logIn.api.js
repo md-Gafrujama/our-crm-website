@@ -29,47 +29,6 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // gmail users signin nhi kar payenge
-    // const pp = email.split('@')
-    // if(pp[1] === "gmail.com")
-    // {
-    //   return res.status(400).json({
-    //     message: "Invalid Email"
-    //   });
-    // }
-
-    // const isEnvAdmin =
-    //   email === process.env.ADMIN_EMAIL &&
-    //   username === process.env.ADMIN_USERNAME &&
-    //   password === process.env.ADMIN_PASSWORD;
-
-    // if (isEnvAdmin) {
-    //   const token = jwt.sign(
-    //     {
-    //       uid: "env-admin",
-    //       username: process.env.ADMIN_USERNAME,
-    //       email: process.env.ADMIN_EMAIL,
-    //       role: "admin"
-    //     },
-    //     JWT_SECRET,
-    //     { expiresIn: "1h" }
-    //   );
-
-    //   return res.status(200).json({
-    //     message: "Login successful (.env admin)",
-    //     user: {
-    //       id: "env-admin",
-    //       username: process.env.ADMIN_USERNAME,
-    //       email: process.env.ADMIN_EMAIL,
-    //       firstName: "Admin",
-    //       lastName: "User",
-    //       role: "admin"
-    //     },
-    //     token,
-    //     userType: "admin"
-    //   });
-    // }
-
     const user = await prisma.user.findFirst({
       where: {
         OR: [
