@@ -164,15 +164,21 @@
 
 
 import axios from 'axios';
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Lazy load the icons to reduce initial bundle size
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 
-// Get API URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Get API base URL from environment variable only
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// Debug: Check what environment variables are available
+console.log('All env variables:', import.meta.env);
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('Mode:', import.meta.env.MODE);
+console.log('Is development?', import.meta.env.DEV);
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -184,8 +190,21 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Check if API_BASE_URL is defined
+  if (!API_BASE_URL) {
+    console.error('VITE_API_BASE_URL environment variable is not defined');
+    console.log('Available environment variables:', Object.keys(import.meta.env));
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-5 rounded-lg shadow-md">
+        <h2 className="mb-5 text-2xl text-red-600">Configuration Error</h2>
+        <p className="text-gray-700">API base URL is not configured. Please check your environment variables.</p>
+        <p className="text-sm text-gray-500 mt-2">Check console for available environment variables.</p>
+      </div>
+    );
+  }
+
   // Memoized handler to prevent unnecessary re-renders
-  const handleChange = React.useCallback((e) => {
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -193,87 +212,38 @@ const Login = () => {
     }));
   }, []);
 
-  // Function to try multiple API endpoints
-  const tryApiCall = async (urls, data, config) => {
-    let lastError = null;
-    
-    for (const url of urls) {
-      try {
-        console.log(`Trying API endpoint: ${url}`);
-        const response = await axios.post(url, data, config);
-        console.log(`Success with endpoint: ${url}`);
-        return response;
-      } catch (error) {
-        console.log(`Failed with endpoint ${url}:`, error.response?.status || error.message);
-        lastError = error;
-        
-        // If it's not a 404, don't try other endpoints
-        if (error.response && error.response.status !== 404) {
-          throw error;
-        }
-      }
-    }
-    
-    // If all endpoints failed, throw the last error
-    throw lastError;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
       console.log('Attempting login with:', formData);
-      console.log('API Base URL:', API_BASE_URL);
-      console.log('Environment (DEV):', import.meta.env.DEV);
+      console.log('Using API URL:', API_BASE_URL); // Debug log for API URL
       
       const source = axios.CancelToken.source();
       const timeoutId = setTimeout(() => {
         source.cancel('Request timed out. Please try again.');
       }, 10000); 
 
-      const requestData = {
-        email: formData.email,
-        username: formData.username, 
-        password: formData.password
-      };
-
-      const requestConfig = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      // Use environment variable for API base URL
+      const response = await axios.post(`${API_BASE_URL}/api/logIn`, 
+        {
+          email: formData.email,
+          username: formData.username, 
+          password: formData.password
         },
-        cancelToken: source.token,
-        timeout: 10000
-      };
-
-      // Define possible API endpoints to try
-      let apiUrls = [];
-      
-      if (import.meta.env.DEV) {
-        // In development, try proxy first, then direct URLs
-        apiUrls = [
-        
-          `${API_BASE_URL}/api/logIn`,
-         
-        ];
-      } else {
-        // In production, try direct URLs with different variations
-        apiUrls = [
-          `${API_BASE_URL}/api/logIn`,
-          
-        ];
-      }
-
-      console.log('Will try these endpoints in order:', apiUrls);
-
-      const response = await tryApiCall(apiUrls, requestData, requestConfig);
+        {
+          // headers: {
+          //   'Content-Type': 'application/json'
+          // },
+          cancelToken: source.token
+        }
+      );
 
       clearTimeout(timeoutId);
 
       const data = response.data;
       
-
       if (data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('loggedIn', 'true'); 
@@ -299,30 +269,9 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      
-      let errorMessage = "Login failed. Please check your credentials.";
-      
-      if (error.name === 'AbortError') {
-        errorMessage = "Request timed out. Please try again.";
-      } else if (error.response) {
-        switch (error.response.status) {
-          case 404:
-            errorMessage = "Login service not found. Please contact support.";
-            break;
-          case 401:
-            errorMessage = "Invalid credentials. Please check your email/username and password.";
-            break;
-          case 500:
-            errorMessage = "Server error. Please try again later.";
-            break;
-          default:
-            errorMessage = `Error ${error.response.status}: ${error.response.data?.message || 'Please try again.'}`;
-        }
-      } else if (error.code === 'ERR_NETWORK') {
-        errorMessage = "Network error. Please check your internet connection.";
-      }
-      
-      alert(errorMessage);
+      alert(error.name === 'AbortError' 
+        ? "Request timed out. Please try again." 
+        : error.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
