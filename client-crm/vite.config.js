@@ -7,7 +7,7 @@ dotenv.config();
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: parseInt( '5173', 10),
+    port: parseInt( '5173' ||'https://our-crm-website-99fa.vercel.app', 10),
     proxy: {
       '/api': {
         target: 'https://our-crm-website.vercel.app', // Remove trailing slash
