@@ -1,8 +1,6 @@
 
-
-
-
 import axios from 'axios';
+
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -41,6 +39,12 @@ const Login = () => {
     const timeoutId = setTimeout(() => {
       source.cancel('Request timed out. Please try again.');
     }, 10000); 
+
+
+
+      // Direct API call to production backend
+      const apiUrl = '/api/logIn'; // Let Vite proxy handle it
+
 
       // change the port address asper your env file (if you have)
       const response = await axios.post("api/api/logIn", 
