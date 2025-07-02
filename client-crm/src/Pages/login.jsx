@@ -253,20 +253,15 @@ const Login = () => {
       if (import.meta.env.DEV) {
         // In development, try proxy first, then direct URLs
         apiUrls = [
-          '/api/logIn',
-          '/api/login', 
+        
           `${API_BASE_URL}/api/logIn`,
-          `${API_BASE_URL}/api/login`,
-          `${API_BASE_URL}/logIn`,
-          `${API_BASE_URL}/login`
+         
         ];
       } else {
         // In production, try direct URLs with different variations
         apiUrls = [
           `${API_BASE_URL}/api/logIn`,
-          `${API_BASE_URL}/api/login`,
-          `${API_BASE_URL}/logIn`,
-          `${API_BASE_URL}/login`
+          
         ];
       }
 
