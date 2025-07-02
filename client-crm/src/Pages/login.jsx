@@ -172,7 +172,7 @@ const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 
 // Get API URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://our-crm-website.vercel.app';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -193,30 +193,86 @@ const Login = () => {
     }));
   }, []);
 
+  // Function to try multiple API endpoints
+  const tryApiCall = async (urls, data, config) => {
+    let lastError = null;
+    
+    for (const url of urls) {
+      try {
+        console.log(`Trying API endpoint: ${url}`);
+        const response = await axios.post(url, data, config);
+        console.log(`Success with endpoint: ${url}`);
+        return response;
+      } catch (error) {
+        console.log(`Failed with endpoint ${url}:`, error.response?.status || error.message);
+        lastError = error;
+        
+        // If it's not a 404, don't try other endpoints
+        if (error.response && error.response.status !== 404) {
+          throw error;
+        }
+      }
+    }
+    
+    // If all endpoints failed, throw the last error
+    throw lastError;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
       console.log('Attempting login with:', formData);
+      console.log('API Base URL:', API_BASE_URL);
+      console.log('Environment (DEV):', import.meta.env.DEV);
+      
       const source = axios.CancelToken.source();
       const timeoutId = setTimeout(() => {
         source.cancel('Request timed out. Please try again.');
       }, 10000); 
 
-      // Use environment variable for API URL
-      const response = await axios.post(`${API_BASE_URL}/api/logIn`, 
-        {
-          email: formData.email,
-          username: formData.username, 
-          password: formData.password
+      const requestData = {
+        email: formData.email,
+        username: formData.username, 
+        password: formData.password
+      };
+
+      const requestConfig = {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        {
-          // headers: {
-          //   'Content-Type': 'application/json'
-          // },
-          cancelToken: source.token
-        });
+        cancelToken: source.token,
+        timeout: 10000
+      };
+
+      // Define possible API endpoints to try
+      let apiUrls = [];
+      
+      if (import.meta.env.DEV) {
+        // In development, try proxy first, then direct URLs
+        apiUrls = [
+          '/api/logIn',
+          '/api/login', 
+          `${API_BASE_URL}/api/logIn`,
+          `${API_BASE_URL}/api/login`,
+          `${API_BASE_URL}/logIn`,
+          `${API_BASE_URL}/login`
+        ];
+      } else {
+        // In production, try direct URLs with different variations
+        apiUrls = [
+          `${API_BASE_URL}/api/logIn`,
+          `${API_BASE_URL}/api/login`,
+          `${API_BASE_URL}/logIn`,
+          `${API_BASE_URL}/login`
+        ];
+      }
+
+      console.log('Will try these endpoints in order:', apiUrls);
+
+      const response = await tryApiCall(apiUrls, requestData, requestConfig);
 
       clearTimeout(timeoutId);
 
@@ -248,9 +304,30 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert(error.name === 'AbortError' 
-        ? "Request timed out. Please try again." 
-        : error.message || "Login failed. Please check your credentials.");
+      
+      let errorMessage = "Login failed. Please check your credentials.";
+      
+      if (error.name === 'AbortError') {
+        errorMessage = "Request timed out. Please try again.";
+      } else if (error.response) {
+        switch (error.response.status) {
+          case 404:
+            errorMessage = "Login service not found. Please contact support.";
+            break;
+          case 401:
+            errorMessage = "Invalid credentials. Please check your email/username and password.";
+            break;
+          case 500:
+            errorMessage = "Server error. Please try again later.";
+            break;
+          default:
+            errorMessage = `Error ${error.response.status}: ${error.response.data?.message || 'Please try again.'}`;
+        }
+      } else if (error.code === 'ERR_NETWORK') {
+        errorMessage = "Network error. Please check your internet connection.";
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
