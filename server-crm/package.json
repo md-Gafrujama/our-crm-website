@@ -11,7 +11,6 @@
     "dev": "nodemon index.js",
     "build": "prisma generate",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate",
     "start": "node index.js"
   },
   "dependencies": {

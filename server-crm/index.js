@@ -25,17 +25,21 @@ import updatePassword from "./middleware/updatePassword.middleware.js";
 import jwtTokenMiddleware from "./middleware/jwtoken.middleware.js"; 
 
 const app = express();
+
+// Updated CORS configuration
 app.use(cors({
-  origin: 'https://our-crm-website-1.onrender.com/', 
+  origin: ['https://our-crm-website-1.onrender.com', 'http://localhost:3000'], // Removed trailing slash
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Content-Disposition'] 
 }));
-app.use(express.json()); 
 
-const port =  3333;
+app.use(express.json()); 
 
 connectDB();
 
+// API routes
 app.use("/api/signUp", signUp);
 app.use("/api/logIn", logIn);
 app.use("/api/checkingOTP", checkingOTP);
@@ -43,15 +47,15 @@ app.use("/api/allUser", userProfile);
 app.use("/updatePassword", updatePassword);
 app.use("/api/addCustomer", addCustomer);
 app.use("/api", updateUserRoutes); 
-app.use("/api/recent",recentActivities);
-app.use("/api/loggedData",loggedData);
-app.use("/api/leads",addLeads);
-app.use("/api/udleads",udleads);
+app.use("/api/recent", recentActivities);
+app.use("/api/loggedData", loggedData);
+app.use("/api/leads", addLeads);
+app.use("/api/udleads", udleads);
 app.use('/api/downloadLeads', downloadLeadsRouter);
-app.use("/api/alert",alertRouter);
-app.use("/api/changePass",changePass);
-app.use("/api/quareb2b/form",qb2b);
-app.use("/api/compareb/form",compareb);
+app.use("/api/alert", alertRouter);
+app.use("/api/changePass", changePass);
+app.use("/api/quareb2b/form", qb2b);
+app.use("/api/compareb/form", compareb);
 
 app.get("/api/protected-route", jwtTokenMiddleware, (req, res) => {
   res.json({
@@ -60,11 +64,16 @@ app.get("/api/protected-route", jwtTokenMiddleware, (req, res) => {
   });
 });
 
-
 app.get("/", (req, res) => {
-    res.send("Welcome to index page");
+  res.send("Welcome to index page");
 });
+
+// Vercel will provide the port automatically
+const port = process.env.PORT || 3333;
 
 app.listen(port, () => {
-    console.log(`Server is running with port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
+
+// Export the Express API for Vercel
+export default app;
