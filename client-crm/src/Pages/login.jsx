@@ -1,7 +1,3 @@
-
-
-
-
 // import axios from 'axios';
 // import React, { useState, lazy, Suspense } from 'react';
 // import { useNavigate } from 'react-router-dom';
@@ -168,6 +164,7 @@
 
 
 import axios from 'axios';
+
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -175,8 +172,7 @@ import { useNavigate } from 'react-router-dom';
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 
-// API configuration - Always use production URL
-const API_BASE_URL = 'https://our-crm-website.vercel.app';
+
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -209,7 +205,7 @@ const Login = () => {
       }, 10000); 
 
       // Direct API call to production backend
-      const apiUrl = `${API_BASE_URL}/api/logIn`;
+      const apiUrl = '/api/logIn'; // Let Vite proxy handle it
 
       console.log('Making request to:', apiUrl); // Debug log
 
