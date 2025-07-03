@@ -22,7 +22,9 @@ import Comparebazar from './Pages/Comparebazar.jsx';
 import ContactQuore from './Pages/ContactQuore.jsx';
 import QuoreandCompareComments from './Pages/QuoreandCompareComments.jsx';
 
+
 function App() {
+  
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("loggedIn") === "true");
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
 
