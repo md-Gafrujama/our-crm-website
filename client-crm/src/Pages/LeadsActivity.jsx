@@ -3,12 +3,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import { API_BASE_URL } from '../config/api'; 
 const download = async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await axios.get('https://our-crm-website.vercel.app/api/downloadLeads', {
+    // const response = await axios.get('https://our-crm-website.vercel.app',
+       const response = await axios.get(`${API_BASE_URL}/api/downloadLeads`, { 
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -92,8 +93,10 @@ const LeadsActivity = () => {
 
       const token = localStorage.getItem('token');
 
-      const response = await axios.put(
-        `https://our-crm-website.vercel.app/api/udleads/update-lead/${updatedLead.id}`,
+      // const response = await axios.put(
+      //   `https://our-crm-website.vercel.app`,
+
+        const response = await axios.put(`${API_BASE_URL}/api/udleads/update-lead/${updatedLead.id}`, 
         payload,
         {
           headers: {
@@ -126,8 +129,13 @@ const LeadsActivity = () => {
   const handleDeleteLead = async (leadId) => {
     try {
     const token = localStorage.getItem('token');
-    await axios.delete(
-      `https://our-crm-website.vercel.app/api/udleads/delete-lead/${leadId}`,
+    // await axios.delete(
+    //   `https://our-crm-website.vercel.app/api/udleads/delete-lead/${leadId}`,
+
+
+   await axios.delete(`${API_BASE_URL}/api/udleads/delete-lead/${leadId}`, 
+
+      
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -173,7 +181,9 @@ const LeadsActivity = () => {
     }
 
     // 2. Fetch recent data with the token
-    const response = await axios.get("https://our-crm-website.vercel.app/api/recent", {
+    // const response = await axios.get("https://our-crm-website.vercel.app", {
+
+      const response = await axios.get(`${API_BASE_URL}/api/recent`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
