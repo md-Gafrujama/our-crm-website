@@ -13,6 +13,7 @@ const AllUsers = () => {
 
   useEffect(() => {
    const fetchUsers = async () => {
+    
   try {
     const token = localStorage.getItem('token');
     if (!token) {

@@ -8,7 +8,7 @@ const download = async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await axios.get('api/api/downloadLeads', {
+    const response = await axios.get('https://our-crm-website.vercel.app/api/downloadLeads', {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -93,7 +93,7 @@ const LeadsActivity = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.put(
-        `api/api/udleads/update-lead/${updatedLead.id}`,
+        `https://our-crm-website.vercel.app/api/udleads/update-lead/${updatedLead.id}`,
         payload,
         {
           headers: {
@@ -127,7 +127,7 @@ const LeadsActivity = () => {
     try {
     const token = localStorage.getItem('token');
     await axios.delete(
-      `api/api/udleads/delete-lead/${leadId}`,
+      `https://our-crm-website.vercel.app/api/udleads/delete-lead/${leadId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -173,7 +173,7 @@ const LeadsActivity = () => {
     }
 
     // 2. Fetch recent data with the token
-    const response = await axios.get("api/api/recent", {
+    const response = await axios.get("https://our-crm-website.vercel.app/api/recent", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
