@@ -19,6 +19,7 @@ const Login = () => {
   const handleChange = React.useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
+
       ...prev,
       [name]: value,
     }));
@@ -29,7 +30,7 @@ const Login = () => {
     setIsLoading(true);
     
 
-    
+//
     try {
       console.log('Attempting login with:', formData);
       const source = axios.CancelToken.source();
