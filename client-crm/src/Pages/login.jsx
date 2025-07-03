@@ -1,9 +1,8 @@
 import axios from 'axios';
 import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config/api'; // Import the API URL
+import { API_BASE_URL } from '../config/api'; 
 
-// Lazy load the icons to reduce initial bundle size
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 
@@ -17,7 +16,6 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Memoized handler to prevent unnecessary re-renders
   const handleChange = React.useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
