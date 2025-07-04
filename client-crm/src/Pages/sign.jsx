@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api'; 
 
 // Lazy load components and icons
 const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })));
@@ -81,7 +82,7 @@ const handleSubmit = async (e) => {
       formDataToSend.append('profilePhoto', formData.profilePhoto);
     }
 
-    const response = await axios.post("api/api/signUp", 
+    const response = await axios.post(`${API_BASE_URL}/api/signUp`, 
       formDataToSend,
       {
           headers: {

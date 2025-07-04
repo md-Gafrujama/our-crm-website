@@ -63,6 +63,8 @@ router.get("/", jwtTokenMiddleware, async (req, res) => {
     res.header('Content-Disposition', 'attachment; filename="leads.csv"');
     res.send(csv);
 
+
+    
   } catch (error) {
     console.error("Download error:", error);
     res.status(500).json({ error: error.message || "Server error" });

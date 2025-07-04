@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api'; 
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(['', '', '', '','','']);
@@ -29,7 +30,7 @@ const OTPPage = () => {
             console.log("Entered OTP:", enteredOtp);
 
             if (enteredOtp.length === 6) {
-                const response = await axios.post("api/api/checkingOTP", 
+                const response = await axios.post(`${API_BASE_URL}/api/checkingOTP`, 
                   { otp: enteredOtp },
                   {
                     headers: {

@@ -1,6 +1,7 @@
 import React, { useState, Suspense, lazy } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
+import { API_BASE_URL } from '../config/api'; 
 
 // Lazy load heavy components (example - if you had any)
 // const HeavyComponent = lazy(() => import('./HeavyComponent'));
@@ -32,7 +33,7 @@ const ForgetPassword = () => {
     }, 10000); // 10s timeout
 
     const response = await axios.post(
-      "api/api/checkingOTP/send",
+      `${API_BASE_URL}/api/checkingOTP/send`,
       { email },
       {
         headers: { "Content-Type": "application/json" },

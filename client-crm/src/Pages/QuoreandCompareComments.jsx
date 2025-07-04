@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { API_BASE_URL } from '../config/api'; 
+
 
 const QuoreandCompareComments = () => {
   const navigate = useNavigate();
@@ -30,8 +32,8 @@ const QuoreandCompareComments = () => {
       }
 
       const apiUrl = activeTab === 'compare' 
-        ? 'api/api/compareb/form' 
-        : 'api/api/quareb2b/form';
+        ? `${API_BASE_URL}/api/compareb/form` 
+        : `${API_BASE_URL}/api/quareb2b/form`;
       
       const response = await axios.get(apiUrl, {
         headers: {

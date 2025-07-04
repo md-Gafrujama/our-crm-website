@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
+import { API_BASE_URL } from '../config/api'; 
+
 
 const AddLeadsForm = () => {
   const navigate = useNavigate();
@@ -65,7 +67,7 @@ const AddLeadsForm = () => {
         notes: formData.notesforfuture,
       };
 
-      const response = await axios.post("api/api/leads", 
+      const response = await axios.post(`${API_BASE_URL}/api/leads`, 
         body, {
         headers: {
           'Content-Type': 'application/json',

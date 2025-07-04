@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api'; 
 
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
 
@@ -41,7 +42,11 @@ const Comparebazar = () => {
       console.log(body)
 
     const res = await axios.post(
+<<<<<<< HEAD
       "/api/compareb/form",
+=======
+      `${API_BASE_URL}/api/compareb/form`,
+>>>>>>> 06be1ae946cbcbceb4253d5259b42e29a5ff4bf9
       body,
       {
         headers: {
