@@ -9,8 +9,6 @@ import { API_BASE_URL } from '../config/api';
 const download = async () => {
   try {
     const token = localStorage.getItem('token');
-
-
     
     // const response = await axios.get('https://our-crm-website.vercel.app/api/downloadLeads',{
        const response = await axios.get(`${API_BASE_URL}/api/downloadLeads`, { 
