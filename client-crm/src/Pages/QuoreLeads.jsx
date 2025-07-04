@@ -53,8 +53,6 @@ const handleCheckboxChange = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token) throw new Error('No authentication token found');
       if (!formData.industry || !formData.serviceinterestedin || !formData.status) {
         toast.error("Please select all dropdown fields.");
         setIsSubmitting(false);
@@ -73,7 +71,6 @@ const handleCheckboxChange = (e) => {
         body, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
       });
 
@@ -85,7 +82,7 @@ const handleCheckboxChange = (e) => {
       pauseOnHover: true,
       draggable: true,
       progress: undefined,
-      style: { fontSize: '1.2rem' }, // Increased font size
+      style: { fontSize: '1.2rem' }, 
     });
     const userType = localStorage.getItem('userType'); 
    if (userType === 'user') {
