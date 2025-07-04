@@ -41,7 +41,7 @@ const Comparebazar = () => {
       console.log(body)
 
     const res = await axios.post(
-      "/api/api/compareb/form",
+      "/api/compareb/form",
       body,
       {
         headers: {
