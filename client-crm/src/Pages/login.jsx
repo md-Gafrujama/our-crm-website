@@ -166,9 +166,11 @@ import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/api';
 
-// Fixed dynamic imports with proper parentheses and error handling
-const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye })).catch(() => ({ default: () => <span>👁️</span> })));
-const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })).catch(() => ({ default: () => <span>👁️‍🗨️</span> })));
+// Dynamic imports with proper error handling
+const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.Eye }))
+  .catch(() => ({ default: () => <span>👁️</span> }));
+const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff }))
+  .catch(() => ({ default: () => <span>👁️‍🗨️</span> })));
 
 // Form validation schema
 const validateForm = (formData) => {
