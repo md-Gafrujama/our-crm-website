@@ -4,7 +4,7 @@ import jwtTokenMiddleware from "../middleware/jwtoken.middleware.js";
 
 const router = express.Router();
 router.use(express.json()); 
-router.post("/", jwtTokenMiddleware,async (req, res) => {
+router.post("/",async (req, res) => {
   try {
     const { userFirstName, userLastName,comment } = req.body;
 
