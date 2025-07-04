@@ -42,11 +42,7 @@ const Comparebazar = () => {
       console.log(body)
 
     const res = await axios.post(
-<<<<<<< HEAD
-      "/api/compareb/form",
-=======
       `${API_BASE_URL}/api/compareb/form`,
->>>>>>> 06be1ae946cbcbceb4253d5259b42e29a5ff4bf9
       body,
       {
         headers: {
