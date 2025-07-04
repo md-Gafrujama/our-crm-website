@@ -21,7 +21,7 @@ import Quoreb2b from './Pages/Quoreb2b.jsx';
 import Comparebazar from './Pages/Comparebazar.jsx';
 import ContactQuore from './Pages/ContactQuore.jsx';
 import QuoreandCompareComments from './Pages/QuoreandCompareComments.jsx';
-
+import QuoreLeads from './Pages/QuoreLeads.jsx';
 
 function App() {
   
@@ -84,6 +84,7 @@ function App() {
             <Route path="/quorecomment" element={<Quoreb2b />} />
             <Route path="/comparebazarcomment" element={<Comparebazar />} />
             <Route path="/contactquore" element={<ContactQuore />} />
+             <Route path="/quoreleads" element={<QuoreLeads />} />
 
             {/* OTP Component tabhi navigate hoga , when otp  is sent */}
 
