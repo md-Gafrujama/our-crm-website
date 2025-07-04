@@ -6,6 +6,8 @@ import React, { useState, lazy, Suspense } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import axios from "axios";
+import { API_BASE_URL } from '../config/api'; 
+
 
 // Lazy loaded components
 const PhoneInput = lazy(() => import('react-phone-input-2'));
@@ -175,7 +177,7 @@ const Register = () => {
   setIsSubmitting(true);
 
   try {
-    const res = await axios.put("api/api/addCustomer", 
+    const res = await axios.put(`${API_BASE_URL}/api/addCustomer`, 
       formDataToLog,
       {
       headers: {

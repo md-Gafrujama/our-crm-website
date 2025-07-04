@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
+import { API_BASE_URL } from '../config/api'; 
+
 
 const RealtimeTracking = () => {
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ const RealtimeTracking = () => {
         phoneNumber: formData.phone,
       };
 
-      const response = await axios.post("api/api/realtimetracking", {
+      const response = await axios.post(`${API_BASE_URL}/api/realtimetracking`, {
         body,
         headers: {
           'Content-Type': 'application/json',

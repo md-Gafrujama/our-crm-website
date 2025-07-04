@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {  useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { API_BASE_URL } from '../config/api'; 
 
 const EditUser = ({ userId, onUpdate, onDelete, onClose }) => {
   // const { userId } = useParams();
@@ -15,7 +15,7 @@ const EditUser = ({ userId, onUpdate, onDelete, onClose }) => {
 useEffect(() => {
   const fetchUser = async () => {
     try {
-      const response = await axios.get(`api/api/user/${userId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/user/${userId}`);
       setUser(response.data);
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to load user');
@@ -55,7 +55,7 @@ useEffect(() => {
         statusOfWork: user.statusOfWork,
       };
     const response = await axios.put(
-      `api/api/user/${userId}`,
+      `${API_BASE_URL}/api/user/${userId}`,
       updateData,
       {
         headers: { 'Content-Type': 'application/json' }
@@ -79,7 +79,7 @@ useEffect(() => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     setDeleting(true);
     try {
-      await axios.delete(`api/api/user/${userId}`);
+      await axios.delete(`${API_BASE_URL}/api/user/${userId}`);
       onDelete(userId);
     } catch {
        const errorMessage = err.response?.data?.message || 

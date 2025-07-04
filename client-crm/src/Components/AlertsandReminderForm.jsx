@@ -2,6 +2,7 @@ import React, { useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api'; 
 
 const ReactToastifyCSS = lazy(() => import('react-toastify/dist/ReactToastify.css'));
 
@@ -57,7 +58,7 @@ const AlertsandReminder = () => {
         description: formData.description,
       };
       console.log(backendData)
-      const response = await axios.post("api/api/alert", 
+      const response = await axios.post(`${API_BASE_URL}/api/alert`, 
         backendData, {
         headers: {
           'Content-Type': 'application/json',

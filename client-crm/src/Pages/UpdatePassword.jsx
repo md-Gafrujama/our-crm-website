@@ -6,6 +6,8 @@ const Eye = lazy(() => import('lucide-react').then(module => ({ default: module.
 const EyeOff = lazy(() => import('lucide-react').then(module => ({ default: module.EyeOff })));
 const Loader2 = lazy(() => import('lucide-react').then(module => ({ default: module.Loader2 })));
 const Lock = lazy(() => import('lucide-react').then(module => ({ default: module.Lock })));
+import { API_BASE_URL } from '../config/api';
+
 
 const UpdatePassword = () => {
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const UpdatePassword = () => {
       setIsSubmitting(true);
       setErrorMessage('');
       try {
-        const response = await axios.put('api/updatePassword', 
+        const response = await axios.put(`${API_BASE_URL}/api/updatePassword`, 
           {
             email,
             newPassword: newPassword,

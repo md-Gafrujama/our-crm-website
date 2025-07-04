@@ -1775,12 +1775,14 @@ import AddLeadsForm from '../Components/AddLeadsForm';
 import AlertsandReminderForm from '../Components/AlertsandReminderForm';
 import RealtimeTracking from '../Components/RealtimeTracking';
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api'; 
+
 
 const download = async () => {
   try {
     const token = localStorage.getItem('token');
 
-    const response = await axios.get('api/api/downloadLeads', {
+    const response = await axios.get(`${API_BASE_URL}/api/downloadLeads`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -2360,7 +2362,7 @@ const [confirmPassword, setConfirmPassword] = useState('');
     
     // Update lead with Axios
     await axios.put(
-      `api/api/udleads/update-lead/${updatedLead.id}`,
+      `${API_BASE_URL}/api/udleads/update-lead/${updatedLead.id}`,
       updatedLead,
       {
         headers: {
@@ -2383,7 +2385,7 @@ const [confirmPassword, setConfirmPassword] = useState('');
     });
 
     // Refresh leads data with Axios
-    const { data } = await axios.get("api/api/loggedData", {
+    const { data } = await axios.get(`${API_BASE_URL}/api/loggedData`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     setLeadsData(data.data);
@@ -2418,7 +2420,7 @@ const handleDeleteLead = async (leadId) => {
     
     // Delete lead with Axios
     await axios.delete(
-      `api/api/udleads/delete-lead/${leadId}`,
+      `${API_BASE_URL}/api/udleads/delete-lead/${leadId}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -2439,7 +2441,7 @@ const handleDeleteLead = async (leadId) => {
     });
 
     // Refresh leads data with Axios
-    const { data } = await axios.get("api/api/loggedData", {
+    const { data } = await axios.get(`${API_BASE_URL}/api/loggedData`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     setLeadsData(data.data);
@@ -2529,7 +2531,7 @@ const handleDeleteLead = async (leadId) => {
       }
 
       console.log('Fetching user data...');
-      const response = await axios.get("api/api/allUser", {
+      const response = await axios.get(`${API_BASE_URL}/api/allUser`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
 
@@ -2669,7 +2671,7 @@ useEffect(() => {
           return;
         }
 
-        const response = await axios.get("api/api/loggedData", {
+        const response = await axios.get(`${API_BASE_URL}/api/loggedData`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -3106,7 +3108,7 @@ const changepass = async (data) => {
           try {
   const token = localStorage.getItem('token');
   const response = await axios.post(
-    "api/api/changePass",
+    `${API_BASE_URL}/api/changePass`,
     {
       currentPassword,
       newPassword
