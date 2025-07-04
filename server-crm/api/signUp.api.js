@@ -15,6 +15,8 @@ router.use((req, res, next) => {
   next();
 });
 
+
+
 router.post("/", upload.single('profilePhoto'),  uploadToCloudinary, async (req, res) => {
   try {
     const { firstName, lastName, username, email, password, phone, role } = req.body;
