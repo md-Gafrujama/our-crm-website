@@ -1,5 +1,6 @@
 import express from "express"
 import prisma from "../prisma/prismaClient.js"
+import jwtTokenMiddleware from "../middleware/jwtoken.middleware.js";
 
 const router = express.Router();
 router.use(express.json()); 
@@ -28,6 +29,16 @@ router.post("/", async (req, res) => {
   }
 });
 
-
+router.get("/", jwtTokenMiddleware,async (req, res) => {
+  try {
+    const comments = await prisma.compare.findMany();
+    return res.status(200).json(comments);
+  } catch (error) {
+    console.error("Error fetching data", error);
+    return res.status(500).json({ 
+      message: "Internal server error",
+    });
+  }
+});
 
 export default router
