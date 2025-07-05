@@ -34,6 +34,7 @@ router.post("/", jwtTokenMiddleware , async (req, res) => {
                 { email }
             ]
         }
+        
     });
 
     let planDetails = null;
