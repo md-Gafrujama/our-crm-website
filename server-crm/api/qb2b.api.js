@@ -4,6 +4,7 @@ import jwtTokenMiddleware from "../middleware/jwtoken.middleware.js";
 
 const router = express.Router();
 router.use(express.json()); 
+
 router.post("/",async (req, res) => {
   try {
     const { userFirstName, userLastName,comment } = req.body;
@@ -34,6 +35,31 @@ router.get("/",jwtTokenMiddleware, async (req, res) => {
     return res.status(200).json(comments);
   } catch (error) {
     console.error("Error fetching data", error);
+    return res.status(500).json({ 
+      message: "Internal server error",
+    });
+  }
+});
+
+router.post("/leads",async (req, res) => {
+  try {
+    const { customerName,emailAddress, phoneNumber, serviceInterestedIn,needs, } = req.body;
+     const qb2bform = await prisma.qb2bLeads.create({
+      data: {
+        customerName,
+        emailAddress,
+        phoneNumber,
+        serviceInterestedIn,
+        needs,
+      },
+    });
+
+     return res.status(201).json({
+      message: "This valuable lead has been saved.",
+    });
+
+  } catch (error) {
+    console.error("Something went wrong", error);
     return res.status(500).json({ 
       message: "Internal server error",
     });

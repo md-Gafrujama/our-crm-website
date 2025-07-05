@@ -102,6 +102,17 @@ model QB2b{
   firstName String
   lastName String
   comment String
+  createdAt  DateTime @default(now())
+}
+
+model Qb2bLeads {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  customerName String
+  emailAddress String
+  phoneNumber String
+  serviceInterestedIn String
+  needs String
+  createdAt DateTime @default(now())
 }
 
 model compare{

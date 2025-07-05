@@ -53,7 +53,7 @@ const handleCheckboxChange = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      if (!formData.industry || !formData.serviceinterestedin || !formData.status) {
+      if (!formData.serviceinterestedin) {
         toast.error("Please select all dropdown fields.");
         setIsSubmitting(false);
         return;
